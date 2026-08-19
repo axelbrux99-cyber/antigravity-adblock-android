@@ -92,7 +92,6 @@ admob.com
 googleadmob.com
 ads.google.com
 mopub.com
-unity3d.com
 unityads.unity3d.com
 ads.unity.com
 applovin.com
@@ -122,11 +121,9 @@ tenjin.io
 admaster.co.id
 icarry.id
 dable.io
-idx.co.id
 
 # === Cryptomining ===
 coinhive.com
-coinhive.min.js
 coin-hive.com
 jsecoin.com
 minero.cc

@@ -1,75 +1,78 @@
 package com.antigravity.adblock
 
+import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.VpnService
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.switchmaterial.SwitchMaterial
+import androidx.core.content.ContextCompat
+import com.antigravity.adblock.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
-    companion object {
-        private const val VPN_PERMISSION_REQUEST = 100
-    }
-
-    private lateinit var toggleSwitch: SwitchMaterial
-    private lateinit var statusText: TextView
-    private lateinit var counterText: TextView
-    private lateinit var domainCountText: TextView
+    private lateinit var binding: ActivityMainBinding
     private val handler = Handler(Looper.getMainLooper())
     private var isUpdating = false
 
+    private val vpnLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            startVpn()
+        } else {
+            binding.toggleProtection.isChecked = false
+            Toast.makeText(this, "VPN permission denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private val notificationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { _ ->
+        // Notification permission result handled cleanly
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        toggleSwitch    = findViewById(R.id.toggle_protection)
-        statusText      = findViewById(R.id.status_text)
-        counterText     = findViewById(R.id.blocked_counter)
-        domainCountText = findViewById(R.id.domain_count)
+        requestNotificationPermission()
 
-        val prefs = getSharedPreferences("antigravity", MODE_PRIVATE)
+        val prefs = getSharedPreferences("antigravity", Context.MODE_PRIVATE)
         val wasEnabled = prefs.getBoolean("vpn_enabled", false)
-        toggleSwitch.isChecked = wasEnabled
+        binding.toggleProtection.isChecked = wasEnabled
         updateUI(wasEnabled)
 
-        toggleSwitch.setOnCheckedChangeListener { _, isChecked ->
+        binding.toggleProtection.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) requestVpnPermission() else stopVpn()
         }
 
         startCounterUpdates()
     }
 
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+
     private fun requestVpnPermission() {
         val intent = VpnService.prepare(this)
         if (intent != null) {
-            startActivityForResult(intent, VPN_PERMISSION_REQUEST)
+            vpnLauncher.launch(intent)
         } else {
             startVpn()
         }
     }
 
-    @Deprecated("Using deprecated API for compatibility")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == VPN_PERMISSION_REQUEST) {
-            if (resultCode == Activity.RESULT_OK) {
-                startVpn()
-            } else {
-                toggleSwitch.isChecked = false
-                Toast.makeText(this, "VPN permission denied", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
     private fun startVpn() {
-        getSharedPreferences("antigravity", MODE_PRIVATE).edit()
+        getSharedPreferences("antigravity", Context.MODE_PRIVATE).edit()
             .putBoolean("vpn_enabled", true).apply()
         AdBlockVpnService.blockedCount.set(0)
         startForegroundService(
@@ -81,7 +84,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun stopVpn() {
-        getSharedPreferences("antigravity", MODE_PRIVATE).edit()
+        getSharedPreferences("antigravity", Context.MODE_PRIVATE).edit()
             .putBoolean("vpn_enabled", false).apply()
         startService(
             Intent(this, AdBlockVpnService::class.java).apply {
@@ -93,14 +96,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateUI(active: Boolean) {
         if (active) {
-            statusText.text = "🛡️ Protection Active"
-            statusText.setTextColor(getColor(R.color.color_active))
+            binding.statusText.text = "🛡️ Protection Active"
+            binding.statusText.setTextColor(ContextCompat.getColor(this, R.color.color_active))
         } else {
-            statusText.text = "⭕ Protection Off"
-            statusText.setTextColor(getColor(R.color.color_disabled))
+            binding.statusText.text = "⭕ Protection Off"
+            binding.statusText.setTextColor(ContextCompat.getColor(this, R.color.color_disabled))
         }
         BlocklistManager.load(applicationContext)
-        domainCountText.text = "${BlocklistManager.size()} domains in blocklist"
+        binding.domainCount.text = "${BlocklistManager.size()} domains in blocklist"
     }
 
     private fun startCounterUpdates() {
@@ -108,7 +111,7 @@ class MainActivity : AppCompatActivity() {
         handler.post(object : Runnable {
             override fun run() {
                 val count = AdBlockVpnService.blockedCount.get()
-                counterText.text = count.toString()
+                binding.blockedCounter.text = count.toString()
                 if (isUpdating) handler.postDelayed(this, 1000)
             }
         })
