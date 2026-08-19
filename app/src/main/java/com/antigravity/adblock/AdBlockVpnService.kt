@@ -143,10 +143,25 @@ class AdBlockVpnService : VpnService() {
             .addDnsServer("10.0.0.2")
             .addRoute("10.0.0.2", 32)
             .addRoute(DNS_UPSTREAM, 32)
+            .addRoute("1.0.0.1", 32)
             .addRoute("8.8.8.8", 32)
+            .addRoute("8.8.4.4", 32)
             .addRoute("9.9.9.9", 32)
+            .addRoute("149.112.112.112", 32)
+            .addRoute("208.67.222.222", 32)
+            .addRoute("208.67.220.220", 32)
+            .addRoute("94.140.14.14", 32)
+            .addRoute("94.140.15.15", 32)
             .setMtu(1500)
             .setBlocking(false)
+
+        runCatching {
+            builder.addAddress("fd00::2", 128)
+            builder.addDnsServer("fd00::2")
+            builder.addRoute("fd00::2", 128)
+            builder.addRoute("2606:4700:4700::1111", 128)
+            builder.addRoute("2001:4860:4860::8888", 128)
+        }
 
         vpnInterface = builder.establish() ?: run {
             Log.e("AG", "Failed to establish VPN interface")
