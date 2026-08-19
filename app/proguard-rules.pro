@@ -1,0 +1,2 @@
+-keep class com.antigravity.adblock.** { *; }
+-keepclassmembers class com.antigravity.adblock.AdBlockVpnService { *; }

@@ -1,0 +1,15 @@
+# Build output
+build/
+.gradle/
+app/build/
+
+# Local config (jangan di-push)
+local.properties
+*.keystore
+*.jks
+
+# IDE
+.idea/
+*.iml
+.DS_Store
+Thumbs.db

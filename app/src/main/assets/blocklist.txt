@@ -1,0 +1,165 @@
+# Antigravity AdBlock Premium — DNS Blocklist
+# Extracted from rules.json + extended for Android system-wide blocking
+# Format: one domain per line, subdomains matched automatically
+# Last updated: 2026-08-19
+
+# === Google Ads ===
+doubleclick.net
+googleadservices.com
+googlesyndication.com
+adservice.google.com
+googletagservices.com
+pagead2.googlesyndication.com
+
+# === Major Ad Networks ===
+taboola.com
+outbrain.com
+adnxs.com
+criteo.com
+pubmatic.com
+rubiconproject.com
+bidswitch.net
+casalemedia.com
+yieldmo.com
+smartadserver.com
+mgid.com
+adcolony.com
+adform.net
+adroll.com
+buysellads.com
+carbonads.net
+adrecover.com
+trafficjunky.com
+
+# === Popups / Pop-unders ===
+popads.net
+popads.org
+popcash.net
+onclickads.net
+onclickperformance.com
+propellerads.com
+adsterra.com
+adsterratechnology.com
+highrevenuegate.com
+clktag.com
+adskeeper.co.uk
+adskeeper.com
+clickadu.com
+hilltopads.com
+monetag.com
+
+# === Adult / Aggressive Ad Networks ===
+exoclick.com
+exosrv.com
+exdynsrv.com
+juicyads.com
+ero-advertising.com
+realsrv.com
+trafficstars.com
+plugrush.com
+yottaa.com
+mndtrk.com
+
+# === Push Notification Networks ===
+onesignal.com
+pushnami.com
+izooto.com
+webpushr.com
+
+# === Social Tracking ===
+pixel.facebook.com
+connect.facebook.net
+analytics.tiktok.com
+ads.tiktok.com
+
+# === Amazon Ads ===
+aax.amazon-adsystem.com
+amazon-adsystem.com
+
+# === Analytics / Tracking ===
+hotjar.com
+google-analytics.com
+scorecardresearch.com
+quantserve.com
+crazyegg.com
+optimizely.com
+amplitude.com
+mixpanel.com
+
+# === Extended Blocklist (Android-specific) ===
+# Mobile ad SDKs
+admob.com
+googleadmob.com
+ads.google.com
+mopub.com
+unity3d.com
+unityads.unity3d.com
+ads.unity.com
+applovin.com
+ironsource.com
+levelplay.com
+chartboost.com
+vungle.com
+inmobi.com
+startapp.com
+tapjoy.com
+fyber.com
+digitalturbine.com
+smaato.com
+appnexus.com
+appnexus.net
+moatads.com
+moat.com
+adeven.com
+adjust.com
+appsflyer.com
+branch.io
+kochava.com
+singular.net
+tenjin.io
+
+# === Indonesian Ad Networks ===
+admaster.co.id
+icarry.id
+dable.io
+idx.co.id
+
+# === Cryptomining ===
+coinhive.com
+coinhive.min.js
+coin-hive.com
+jsecoin.com
+minero.cc
+webminerpool.com
+crypto-loot.com
+papoto.com
+miner.pr0gramm.com
+minemytraffic.com
+
+# === Malware / Spam domains ===
+delivery.socialcom.net
+track.hubspot.com
+cdn.doubleverify.com
+doubleverify.com
+adsafeprotected.com
+moatpixel.com
+ads.linkedin.com
+ads.twitter.com
+ads.reddit.com
+advertising.com
+atdmt.com
+zedo.com
+adblade.com
+adf.ly
+linkbucks.com
+bc.vc
+adfoc.us
+
+# === Spyware / Telemetry ===
+telemetry.microsoft.com
+vortex.data.microsoft.com
+settings-win.data.microsoft.com
+watson.telemetry.microsoft.com
+oca.telemetry.microsoft.com
+nexus.officeapps.live.com
+browser.events.data.microsoft.com

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Background -->
+    <color name="bg_dark">#0A0E17</color>
+    <color name="card_bg">#111827</color>
+
+    <!-- Text -->
+    <color name="color_text_main">#F9FAFB</color>
+    <color name="color_text_sub">#6B7280</color>
+
+    <!-- Accent -->
+    <color name="color_active">#00F2FE</color>
+    <color name="color_disabled">#6B7280</color>
+
+    <!-- Switch -->
+    <color name="switch_track_on">#00F2FE</color>
+    <color name="switch_track_off">#374151</color>
+    <color name="switch_thumb_on">#FFFFFF</color>
+    <color name="switch_thumb_off">#9CA3AF</color>
+</resources>
