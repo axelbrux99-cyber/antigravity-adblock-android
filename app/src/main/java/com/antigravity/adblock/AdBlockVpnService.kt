@@ -118,6 +118,107 @@ class AdBlockVpnService : VpnService() {
         }
     }
 
+    private var vpnInterface: ParcelFileDescriptor? = null
+    private var serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == ACTION_STOP) {
+            stopSelf()
+            return START_NOT_STICKY
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startForeground(NOTIF_ID, buildNotification("Starting…"), ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+        } else {
+            startForeground(NOTIF_ID, buildNotification("Starting…"))
+        }
+        BlocklistManager.load(applicationContext)
+        startVpn()
+        return START_STICKY
+    }
+
+    private fun startVpn() {
+        val builder = Builder()
+            .setSession("Antigravity AdBlock")
+            .addAddress("10.0.0.2", 32)
+            .addDnsServer("10.0.0.2")
+            .addRoute("10.0.0.2", 32)
+            .addRoute(DNS_UPSTREAM, 32)
+            .addRoute("8.8.8.8", 32)
+            .addRoute("9.9.9.9", 32)
+            .setMtu(1500)
+            .setBlocking(false)
+
+        vpnInterface = builder.establish() ?: run {
+            Log.e("AG", "Failed to establish VPN interface")
+            stopSelf()
+            return
+        }
+
+        val fd = vpnInterface!!.fileDescriptor
+        val input  = FileInputStream(fd)
+        val output = FileOutputStream(fd)
+
+        serviceScope.launch {
+            val packet = ByteArray(32767)
+            updateNotification("🛡️ Protecting — ${BlocklistManager.size()} domains blocked")
+
+            while (isActive) {
+                val length = runCatching { input.read(packet) }.getOrDefault(-1)
+                if (length <= 0) {
+                    delay(5)
+                    continue
+                }
+
+                val buf = ByteBuffer.wrap(packet, 0, length)
+                val ipHeader = parseIpv4Header(buf) ?: continue
+
+                // Only handle UDP port 53 (DNS)
+                if (ipHeader.protocol != 17 || ipHeader.dstPort != DNS_PORT) {
+                    // Forward all non-DNS traffic directly (bypass VPN)
+                    // ponytail: non-DNS traffic flows normally; we only intercept DNS
+                    continue
+                }
+
+                val dnsPayload = packet.copyOfRange(ipHeader.dnsOffset, ipHeader.dnsOffset + ipHeader.dnsLength)
+                val domain = DnsPacketParser.parseDomain(dnsPayload)
+
+                if (domain != null && BlocklistManager.isBlocked(domain)) {
+                    // Build blocked response and write back into TUN
+                    val blockedDns = DnsPacketParser.buildBlockedResponse(dnsPayload)
+                    val response   = buildIpv4UdpResponse(ipHeader, blockedDns)
+                    runCatching { output.write(response) }
+                    val count = blockedCount.incrementAndGet()
+                    if (count % 10 == 0L) {
+                        updateNotification("🛡️ Blocked $count requests")
+                    }
+                } else {
+                    // Forward DNS query to 1.1.1.1 and relay response
+                    launch {
+                        val response = forwardDns(dnsPayload) ?: return@launch
+                        val ipResponse = buildIpv4UdpResponse(ipHeader, response)
+                        runCatching { output.write(ipResponse) }
+                    }
+                }
+            }
+        }
+    }
+
+    /** Forward DNS query to upstream (1.1.1.1), return raw DNS response bytes. */
+    private suspend fun forwardDns(query: ByteArray): ByteArray? = withContext(Dispatchers.IO) {
+        runCatching {
+            DatagramSocket().use { socket ->
+                protect(socket)   // Bypass our own VPN for upstream DNS
+                socket.soTimeout = 3000
+                val upstream = InetAddress.getByName(DNS_UPSTREAM)
+                socket.send(DatagramPacket(query, query.size, upstream, DNS_PORT))
+                val buf = ByteArray(4096)
+                val response = DatagramPacket(buf, buf.size)
+                socket.receive(response)
+                buf.copyOf(response.length)
+            }
+        }.getOrNull()
+    }
+
     // ─── Notification ──────────────────────────────────────────────────────
 
     private fun buildNotification(text: String): Notification {
