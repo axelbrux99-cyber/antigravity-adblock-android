@@ -14,7 +14,12 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.antigravity.adblock.databinding.ActivityMainBinding
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
@@ -51,7 +56,45 @@ class MainActivity : AppCompatActivity() {
             if (isChecked) requestVpnPermission() else stopVpn()
         }
 
+        binding.btnSyncGithub.setOnClickListener {
+            syncWithGitHub(userInitiated = true)
+        }
+
         startCounterUpdates()
+
+        // Auto-sync with GitHub in background on launch
+        syncWithGitHub(userInitiated = false)
+    }
+
+    private fun syncWithGitHub(userInitiated: Boolean) {
+        binding.btnSyncGithub.isEnabled = false
+        binding.syncStatus.text = "🔄 Memeriksa pembaruan di GitHub…"
+
+        lifecycleScope.launch {
+            val result = BlocklistManager.updateFromGitHub(applicationContext)
+            binding.btnSyncGithub.isEnabled = true
+
+            result.onSuccess { count ->
+                binding.domainCount.text = "$count domains in blocklist"
+                val timeStr = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+                binding.syncStatus.text = "✅ Terhubung ke GitHub (Update terakhir: $timeStr)"
+                if (userInitiated) {
+                    Toast.makeText(this@MainActivity, "✅ Blocklist diperbarui: $count domain aktif", Toast.LENGTH_SHORT).show()
+                }
+            }.onFailure { error ->
+                val prefs = getSharedPreferences("antigravity", Context.MODE_PRIVATE)
+                val lastSync = prefs.getLong("last_blocklist_sync", 0L)
+                if (lastSync > 0) {
+                    val dateStr = SimpleDateFormat("dd/MM HH:mm", Locale.getDefault()).format(Date(lastSync))
+                    binding.syncStatus.text = "Mode offline (Sinkron terakhir: $dateStr)"
+                } else {
+                    binding.syncStatus.text = "Menggunakan blocklist bawaan (Offline)"
+                }
+                if (userInitiated) {
+                    Toast.makeText(this@MainActivity, "Gagal koneksi ke GitHub (Periksa internet)", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
     private fun requestNotificationPermission() {
