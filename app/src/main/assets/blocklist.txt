@@ -1,6 +1,45 @@
 # Antigravity AdBlock Premium — Comprehensive DNS Blocklist
 # Format: one domain per line, subdomains matched automatically
-# Updated: 2026-08-19 (Enhanced with Agoda, SEA networks, Pangle, RTBHouse, Criteo)
+# Updated: 2026-08-19 (Enhanced with Voya, Bigo Ads, Kwai Ads, Agoda, SEA networks, Pangle, RTBHouse, Criteo)
+
+# === Voya & Social/Dating App Ads & Tracking Networks ===
+voya.world
+voya.chat
+voyalive.com
+voya.app
+voyameet.com
+imvoya.com
+bigossp.com
+bigoads.com
+ads.bigo.sg
+ssp.bigo.sg
+bigo.sg
+like-video.com
+kwai.com
+kwai.net
+kwaicdn.com
+tradplusad.com
+toponad.com
+tp-sdk.com
+mobvista.com
+mobisummer.com
+applvn.com
+applovin.com
+pangolin-sdk.com
+pangolin.sgsnssdk.com
+pangle.io
+mon.zijieapi.com
+toblog.ctobsnssdk.com
+is.snssdk.com
+log.snssdk.com
+inner-active.mobi
+sponsorpay.com
+smaato.net
+smaato.com
+yandex.ru
+an.yandex.ru
+appmetrica.yandex.net
+mobile.yandex.net
 
 # === Agoda & Travel Ad / Tracking Networks ===
 ads.agoda.com
@@ -104,16 +143,10 @@ hilltopads.com
 monetag.com
 
 # === Mobile In-App Ad SDKs (TikTok / Pangle / Unity / AppLovin) ===
-pangle.io
-pangolin-sdk.com
-pangolin.sgsnssdk.com
-mon.zijieapi.com
-toblog.ctobsnssdk.com
 mintegral.com
 mintegral.net
 inmobi.com
 inmobicdn.net
-applovin.com
 ironsource.com
 levelplay.com
 unityads.unity3d.com
@@ -125,7 +158,6 @@ startapp.com
 tapjoy.com
 fyber.com
 digitalturbine.com
-smaato.com
 mopub.com
 
 # === Mobile Attribution & Telemetry Trackers ===
