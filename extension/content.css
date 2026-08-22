@@ -1,0 +1,36 @@
+﻿/* Antigravity AdBlock - Cosmetic Filtering & Element Hiding */
+ins.adsbygoogle,
+div[id^="google_ads_iframe"],
+div[id^="div-gpt-ad"],
+div[id*="advertisement"],
+div[id*="ad-banner"],
+div[class*="ad-container"],
+div[class*="ad_wrapper"],
+div[class*="banner-ad"],
+.taboola-ad,
+.outbrain-ad,
+.mgid-ad,
+.native-ad,
+.sponsored-post,
+.ad-slot,
+.ad-box,
+[data-ad-unit],
+[data-ad-client],
+[data-ad-slot],
+iframe[src*="doubleclick.net"],
+iframe[src*="googleads"],
+iframe[src*="adservice.google"],
+iframe[src*="taboola.com"],
+iframe[src*="outbrain.com"],
+iframe[src*="criteo.com"],
+iframe[src*="rtbhouse.com"] {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
